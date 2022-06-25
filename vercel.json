@@ -1,0 +1,8 @@
+{
+  "builds": [
+    { "src": "*.php", "use": "now-php@canary" }
+  ],
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.php" }
+  ]
+}
