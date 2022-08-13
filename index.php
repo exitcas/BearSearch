@@ -1,19 +1,25 @@
 <?php
 include "vurl.php";
 if ($vi == "") {
-  die("https://bearsearch.lu700.repl.co/[username]");
+  die("<!DOCTYPE html><html lang=\"en\" dir=\"ltr\"><head><title>BearSearch</title></head><body style=\"font-family:'Verdana', sans-serif\"><h1>BearSearch</h1><p>Create a \"search engine\" for your <a href=\"https://bearblog.dev/\">Bearblog</a></p><ol><li>Create a blog/post with the permalink '<input style=\"font-style:italic;\" type=\"text\" value=\"this-blog-uses-bearsearch\" disabled />'. It could be listed or not, but it should be available via URL.</li><li>Enter to http://".htmlentities($_SERVER["HTTP_HOST"])."/[your username*] <i>(Eg.: <a href=\"/luqaska\">http://".htmlentities($_SERVER["HTTP_HOST"])."/luqaska</a>)</i></li></ol><p>*if you have a custom url, use your original one (or the one that appears as your name at the blog's RSS feed)</p><footer><a href=\"https://github.com/Luqaska/BearSearch\">Source code</a>. This website is not affilated with Bearblog or Herman Martinus.</footer></body></html>");
 }
 
-set_error_handler(function() { die("This user doesn't exist"); });
+function error() {
+  http_response_code(404);
+  die("<!DOCTYPE html><html lang=\"en\" dir=\"ltr\"><body style=\"font-family:'Verdana', sans-serif\"><h1>BearSearch</h1><p>This blog doesn't exist (or it hasn't been added yet)</p><p><a href=\"/\">Go home?</a></p><footer><a href=\"https://github.com/Luqaska/BearSearch\">Source code</a>. This website is not affilated with Bearblog or Herman Martinus.</footer></body></html>");
+}
+
 $blog = "https://$vi.bearblog.dev/";
+ob_start();
 $web = file_get_contents($blog);
 $meta = get_meta_tags($blog);
 $handle = curl_init($blog."this-blog-uses-bearsearch/");
 curl_setopt($handle, CURLOPT_RETURNTRANSFER, TRUE);
 $response = curl_exec($handle);
 $httpCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
+ob_end_clean();
 if($httpCode == 404) {
-  die("This user doesn't exist");
+  error();
 }
 curl_close($handle);
 
@@ -39,12 +45,30 @@ input[type=submit] {
 <header>
 <a class="title" href="<?= $blog ?>"><h1><?= $meta["title"]; ?></h1></a>
 <nav>
-<?php preg_match('/<nav>(.*?)<\/nav>/s', $web, $match); echo $match[0]; ?>
+<?php preg_match('/<nav>(.*?)<\/nav>/s', $web, $match); echo $match[0];
+/*preg_match('/<nav>(.*?)<\/nav>/s', $web, $match); $match=explode("\n", simplexml_load_string($match[0])["nav"]);
+foreach ($match as $id => $m) {
+  $line = simplexml_load_string($m);
+  if (isset($line["href"])) {
+    if (!filter_var($line["href"], FILTER_VALIDATE_URL)) {
+      $line["href"] = $blog . $line["href"];
+    }
+  }
+  echo $id;
+  $a = "<";
+  foreach ($line as $i => $l) {
+    $a += $i;
+    if ($l) {$a+='="'.$l.'"';}
+  }
+  $a += ">";
+  $match[$id] = $a;
+}
+echo implode("\n", $match);*/ ?>
 </nav>
 </header>
 <main>
 <content>
-  <form method="GET"><input type="text" name="q" placeholder="*query goes here*" <?php if (isset($_GET["q"])) { echo "value=\"" . htmlentities($_GET["q"]) . "\""; } ?> required><input type="submit" value="Search"></form>
+  <form method="GET"><input type="text" name="q" placeholder="Lorem Ipsum" <?php if (isset($_GET["q"])) { echo "value=\"" . htmlentities($_GET["q"]) . "\""; } ?> required><input type="submit" value="Search"></form>
     <?php if (isset($_GET["q"])) {
      $fileContents= file_get_contents($blog."feed/");
      $fileContents = str_replace(array("\n", "\r", "\t"), '', $fileContents);
@@ -70,8 +94,7 @@ input[type=submit] {
 </content>
 </main>
 <footer>
-  Powered by <a href="https://bearblog.dev">Bear ʕ•ᴥ•ʔ</a>(<a href="/">search</a>)<br />
-  <a href="/block.php">Block your website</a>
+  Powered by <a href="/">BearSearch</a>
 </footer>
 </body>
 </html>
