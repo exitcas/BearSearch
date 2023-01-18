@@ -28,9 +28,16 @@ curl_close($handle);
 <html>
 <head>
 <title><?= $meta["title"]; ?></title>
-<?php preg_match('/<link rel="shortcut icon" href="(.*?)">/s', $web, $match); echo $match[0]."\n"; ?>
+<?php preg_match("/<link rel=\"shortcut icon\" type=\"image\/svg\+xml\" href=\"data:image\/svg\+xml,(.*)\">/", $web, $match); echo $match[0]."\n"; ?>
 <link rel="alternate icon" href="https://bearblog.dev/static/favicon.ico" type="image/x-icon" sizes="48x48"/>
 <style>
+input[type=text] {
+  background-color: inherit;
+  color: inherit;
+  border: 1px solid;
+  padding: 5px;
+  font-size: 16px;
+}
 input[type=submit] {
   background-color: inherit;
   color: inherit;
