@@ -1,6 +1,6 @@
 {
   "builds": [
-    { "src": "*.php", "use": "vercel-php@canary" }
+    { "src": "*.php", "use": "vercel-php@0.5.2" }
   ],
   "rewrites": [
     { "source": "/vurl.php", "destination": "/vurl.php" },
